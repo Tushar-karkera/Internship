@@ -27,7 +27,7 @@ n2 = Switch("n2")
 etn1.set_address("10.0.0.1/24")
 etn3.set_address("10.0.0.2/24")
 
-# adding a choke Queue Discipline
+# configuring the queue size
 qdisc = "choke"
 choke_parameters = {
     "limit": "100",  # set the queue capacity to 100 packets
@@ -35,14 +35,15 @@ choke_parameters = {
     "max": "15",  # set the maximum threshold to 15 packets
 }
 
-# Set the bandwidth and the delay between the nodes
+# Setting the bandwidth and the delay between the nodes
+# also setting the queue size previously configured
 etn1.set_attributes("5mbit", "2ms", qdisc, **choke_parameters)
 etn3.set_attributes("5mbit", "2ms", qdisc, **choke_parameters)
 
 etn2a.set_attributes("5mbit", "2ms", qdisc, **choke_parameters)
 etn2b.set_attributes("5mbit", "2ms", qdisc, **choke_parameters)
 
-# Created an new experiment
+# Creating an new experiment
 exp = Experiment("three-node-point-to-point")
 
 # creating a new Flow from `n1` to `n3` .
