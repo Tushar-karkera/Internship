@@ -46,8 +46,8 @@ etn2b.set_attributes("5mbit", "2ms", qdisc, **choke_parameters)
 # Creating an new experiment
 exp = Experiment("three-node-point-to-point")
 
-# creating a new Flow from `n1` to `n3` .
-flow1 = Flow(n1, n3, etn3.get_address(), 0, 50, 1)
+# creating a new Flow from `n1` to `n3` for 20 seconds.
+flow1 = Flow(n1, n3, etn3.get_address(), 0, 20, 1)
 
 # Use `flow1` as a UDP flow with target bandwidth of 5mbit.
 exp.add_udp_flow(flow1, target_bandwidth="5mbit")
