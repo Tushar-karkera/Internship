@@ -4,15 +4,15 @@ from nest.experiment import *
 # and n2-n3. Apply TCP agent between n0-n3 and UDP n1-n3. Apply relevant applications
 # over TCP and UDP agents changing the parameter and determine the number of packets by
 # TCP/UDP.
-####################################################
-#                          Network Topology        #
-#                                                  #
-#  N0               N1                          N3 #
-#  |                |                           |  #
-#  ----------------------------- N2 -------------  #
-#         <------ 12mbit, 1ms ------>              #
-#                                                  #
-####################################################
+########################################
+#              Network Topology        #
+#                                      #
+#  N0                N1                #
+#  |                 |                 #
+#  ---------------- N2 ------------ N3 #
+#      <------ 12mbit, 1ms ------>     #
+#                                      #
+########################################
 
 # Create three hosts `n0` to `n3`, and one switch `s1` representing the node `n2`
 n0 = Node("n0")
