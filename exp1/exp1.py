@@ -48,7 +48,7 @@ exp = Experiment("three-node-point-to-point")
 # creating a new Flow from `n1` to `n3` .
 flow1 = Flow(n1, n3, etn3.get_address(), 0, 50, 1)
 
-# Use `flow1` as a UDP flow .
+# Use `flow1` as a UDP flow with target bandwidth of 5mbit.
 exp.add_udp_flow(flow1, target_bandwidth="5mbit")
 
 # Run the experiment
