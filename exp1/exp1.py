@@ -39,13 +39,17 @@ choke_parameters = {
 etn1.set_attributes("5mbit", "2ms", qdisc, **choke_parameters)
 etn3.set_attributes("5mbit", "2ms", qdisc, **choke_parameters)
 
+etn2a.set_attributes("5mbit", "2ms", qdisc, **choke_parameters)
+etn2b.set_attributes("5mbit", "2ms", qdisc, **choke_parameters)
+
 # Created an new experiment
 exp = Experiment("three-node-point-to-point")
 
 # creating a new Flow from `n1` to `n3` .
 flow1 = Flow(n1, n3, etn3.get_address(), 0, 50, 1)
 
-# Use `flow1` as a TCP flow .
+# Use `flow1` as a UDP flow .
 exp.add_udp_flow(flow1, target_bandwidth="5mbit")
 
+# Run the experiment
 exp.run()
