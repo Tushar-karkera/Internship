@@ -45,7 +45,7 @@ flow1 = Flow(n0, n3, etn3.get_address(), 0, 20, 1)
 # Use `flow1` as a TCP BBR flow.
 exp.add_tcp_flow(flow1, "bbr")
 
-# Flow2 is of udp between `n1` and `n3`
+# Flow2 is of udp between `n1` and `n3` for 20 seconds .
 flow2 = Flow(n1, n3, etn3.get_address(), 0, 20, 1)
 
 # would send UDP packets.
