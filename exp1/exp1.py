@@ -1,5 +1,6 @@
 from nest.topology import *
 from nest.experiment import *
+from nest.experiment.tools import Iperf3
 
 # Simulate a three nodes point-to-point network with duplex links between them. Set the queue
 # size vary the bandwidth and find the number of packets dropped.
@@ -31,13 +32,16 @@ etr1b.set_address("10.0.1.2/24")
 eth2.set_address("10.0.1.2/24")
 
 # Add default route for the gateway
-h1.add_route("DEFAULT",eth1)
-h2.add_route("DEFAULT",eth2)
+h1.add_route("DEFAULT", eth1)
+h2.add_route("DEFAULT", eth2)
 
 # configuring the queue size
 qdisc = "pfifo"
 pfifo_parameters = {
     "limit": "20",  # set the queue capacity to 20 packets
+    "flows": "1",  # set the number of flows to 2
+    "target": "2ms",  # set the target queue delay to 2ms (default is 5ms)
+    "interval": "24ms",  # set the interval value to 24ms (default is 100ms)
 }
 
 # Setting the bandwidth and the delay between the nodes
@@ -55,10 +59,19 @@ exp = Experiment("three-node-point-to-point")
 flow1 = Flow(h1, h2, eth2.get_address(), 0, 10, 1)
 
 # Use `flow1` as a UDP flow with target bandwidth of 5mbit.
-exp.add_udp_flow(flow1, target_bandwidth="5mbit")
+exp.add_udp_flow(flow1,
+                 server_options=Iperf3.server_option(
+                    port_no=3008,
+                    s_verbose=True,
+                    daemon=True
+                 ),
+                 client_options = Iperf3.client_option(
+                     cport=3005,
+                 ),
+                 )
 
 # Enable statistics on the etr1a interface of the router
-exp.require_qdisc_stats(etr1b)
+#exp.require_qdisc_stats(etr1b)
 
 # Run the experiment
 exp.run()
