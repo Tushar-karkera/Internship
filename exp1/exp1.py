@@ -1,5 +1,6 @@
 from nest.topology import *
 from nest.experiment import *
+from nest.experiment.tools import Iperf3
 
 # Simulate a three nodes point-to-point network with duplex links between them. Set the queue
 # size vary the bandwidth and find the number of packets dropped.
@@ -37,11 +38,11 @@ choke_parameters = {
 
 # Setting the bandwidth and the delay between the nodes
 # also setting the queue size previously configured
-etn1.set_attributes("5mbit", "2ms", qdisc, **choke_parameters)
-etn3.set_attributes("5mbit", "2ms", qdisc, **choke_parameters)
+etn1.set_attributes("5mbit", "2ms", qdisc)
+etn3.set_attributes("5mbit", "2ms", qdisc)
 
 etn2a.set_attributes("5mbit", "2ms", qdisc, **choke_parameters)
-etn2b.set_attributes("5mbit", "2ms", qdisc, **choke_parameters)
+etn2b.set_attributes("5mbit", "2ms", qdisc)
 
 # Creating an new experiment
 exp = Experiment("three-node-point-to-point")
@@ -50,7 +51,12 @@ exp = Experiment("three-node-point-to-point")
 flow1 = Flow(n1, n3, etn3.get_address(), 0, 20, 1)
 
 # Use `flow1` as a UDP flow with target bandwidth of 5mbit.
-exp.add_udp_flow(flow1, target_bandwidth="5mbit")
+exp.add_udp_flow(flow1,
+                 server_options=Iperf3.server_option(
+                     port_no=3001
+                 )
+                 )
 
+exp.qdisc_stats()
 # Run the experiment
 exp.run()
