@@ -59,19 +59,10 @@ exp = Experiment("three-node-point-to-point")
 flow1 = Flow(h1, h2, eth2.get_address(), 0, 10, 1)
 
 # Use `flow1` as a UDP flow with target bandwidth of 5mbit.
-exp.add_udp_flow(flow1,
-                 server_options=Iperf3.server_option(
-                    port_no=3008,
-                    s_verbose=True,
-                    daemon=True
-                 ),
-                 client_options = Iperf3.client_option(
-                     cport=3005,
-                 ),
-                 )
+exp.add_udp_flow(flow1, target_bandwidth="5mbit")
 
 # Enable statistics on the etr1a interface of the router
-#exp.require_qdisc_stats(etr1b)
+# exp.require_qdisc_stats(etr1b)
 
 # Run the experiment
 exp.run()
