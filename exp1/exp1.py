@@ -10,45 +10,50 @@ from nest.experiment.tools import Iperf3
 #                                                  #
 #                                                  #
 #                                                  #
-#  N1------------------n2---------------------- N3 #
+#  h1------------------r1---------------------- h2 #
 #         <------ 5mbit, 2ms ------>               #
 #                                                  #
 ####################################################
 
-# Created 3 Nodes
-n1 = Node("n1")
-n3 = Node("n3")
-n2 = Switch("n2")
+# Created 2 Nodes and a router
+h1 = Node("h1")
+h2 = Node("h2")
+r1 = Router("r1")
 
-# Connect the nodes to switch n2
-(etn1, etn2a) = connect(n1, n2)
-(etn3, etn2b) = connect(n3, n2)
+# Connect the nodes to router r1
+(eth1, etr1a) = connect(h1, r1)
+(eth2, etr1b) = connect(h2, r1)
 
-# Assigning IP Address to the Nodes
-etn1.set_address("10.0.0.1/24")
-etn3.set_address("10.0.0.2/24")
+# Assigning IP Address to the node and router interfaces
+eth1.set_address("10.0.0.1/24")
+etr1a.set_address("10.0.0.2/24")
+
+etr1b.set_address("10.0.1.2/24")
+eth2.set_address("10.0.1.2/24")
+
+# Add default route for the gateway
+h1.add_route("DEFAULT", eth1)
+h2.add_route("DEFAULT", eth2)
 
 # configuring the queue size
-qdisc = "choke"
-choke_parameters = {
-    "limit": "100",  # set the queue capacity to 100 packets
-    "min": "5",  # set the minimum threshold to 5 packets
-    "max": "15",  # set the maximum threshold to 15 packets
+qdisc = "pfifo"
+pfifo_parameters = {
+    "limit": "20",  # set the queue capacity to 20 packets
 }
 
 # Setting the bandwidth and the delay between the nodes
 # also setting the queue size previously configured
-etn1.set_attributes("5mbit", "2ms", qdisc)
-etn3.set_attributes("5mbit", "2ms", qdisc)
+eth1.set_attributes("50mbit", "2ms")
+eth2.set_attributes("50mbit", "2ms")
 
-etn2a.set_attributes("5mbit", "2ms", qdisc, **choke_parameters)
-etn2b.set_attributes("5mbit", "2ms", qdisc)
+etr1a.set_attributes("50mbit", "2ms")
+etr1b.set_attributes("50mbit", "2ms", qdisc, **pfifo_parameters)
 
 # Creating an new experiment
 exp = Experiment("three-node-point-to-point")
 
-# creating a new Flow from `n1` to `n3` for 20 seconds.
-flow1 = Flow(n1, n3, etn3.get_address(), 0, 20, 1)
+# creating a new Flow from `h1` to `h2` for 20 seconds.
+flow1 = Flow(h1, h2, eth2.get_address(), 0, 10, 1)
 
 # Use `flow1` as a UDP flow with target bandwidth of 5mbit.
 exp.add_udp_flow(flow1,
@@ -57,6 +62,8 @@ exp.add_udp_flow(flow1,
                  )
                  )
 
-exp.qdisc_stats()
+# Enable statistics on the etr1a interface of the router
+exp.require_qdisc_stats(etr1b)
+
 # Run the experiment
 exp.run()
