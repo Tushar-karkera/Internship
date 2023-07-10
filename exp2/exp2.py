@@ -2,7 +2,7 @@ from nest.topology import *
 from nest.experiment import *
 # Simulate a four node point-to-point network, and connect the links as follows: n0-n2, n1-n2
 # and n2-n3. Apply TCP agent between n0-n3 and UDP n1-n3. Apply relevant applications
-# over TCP and UDP agents changing the parameter and determine the number of packets by
+# over TCP and UDP agents changing the parameter and determine the number of packets dropped by
 # TCP/UDP.
 ########################################
 #            Network Topology          #
@@ -54,14 +54,15 @@ exp = Experiment("4-node-tcp")
 # Flow1 is of tcp between `n0` and `n3` for a time duration of 10 seconds.
 flow1 = Flow(n0, n3, etn3.get_address(), 0, 10, 1)
 
+exp.require_qdisc_stats(etr1a)
 # Use `flow1` as a TCP flow.
 exp.add_tcp_flow(flow1)
 
 # Flow2 is of udp between `n1` and `n3` for a time duration 10 seconds.
 flow2 = Flow(n1, n3, etn3.get_address(), 0, 10, 1)
 
-# would send UDP packets.
-exp.add_udp_flow(flow2, target_bandwidth="10mbit")
+# Setting UDP bandwidth higher to bottleneck the network and lead to packet drops.
+exp.add_udp_flow(flow2, target_bandwidth="50mbit")
 
 # Run the experiment
 # simulation is stored in the folder `/4-node-tcp(08-07-2023-09:25:52)_dump`
