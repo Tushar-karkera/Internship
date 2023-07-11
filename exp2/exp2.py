@@ -65,5 +65,4 @@ flow2 = Flow(n1, n3, etn3.get_address(), 0, 10, 1)
 exp.add_udp_flow(flow2, target_bandwidth="50mbit")
 
 # Run the experiment
-# simulation is stored in the folder `/4-node-tcp(08-07-2023-09:25:52)_dump`
 exp.run()
