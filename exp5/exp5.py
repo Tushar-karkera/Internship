@@ -49,14 +49,50 @@ eth4.set_address("10.0.1.4/24")
 eth5.set_address("10.0.1.5/24")
 eth6.set_address("10.0.1.6/24")
 
+
+h1.add_route("DEFAULT", eth1)  # Adding a default route to node h1 via eth1
+h2.add_route("DEFAULT", eth2)  # Adding a default route to node h2 via eth2
+h3.add_route("DEFAULT", eth3)  # Adding a default route to node h3 via eth3
+h4.add_route("DEFAULT", eth4)  # Adding a default route to node h4 via eth4
+h5.add_route("DEFAULT", eth5)  # Adding a default route to node h5 via etr5
+h6.add_route("DEFAULT", eth6)  # Adding a default route to node h6 via eth6
+
+# configuring the queue size.
+# applying Packet Limited queue in this scenario.
+qdisc = "pfifo"
+pfifo_parameter = {"limit": "20"}  # set the queue capacity to 20 packets
+
+
 # Set the link attributes
 eth1.set_attributes("100mbit", "1ms")
 eth2.set_attributes("100mbit", "1ms")
 eth3.set_attributes("100mbit", "1ms")
-eth4.set_attributes("100mbit", "1ms")
-eth5.set_attributes("100mbit", "1ms")
-eth6.set_attributes("100mbit", "1ms")
+ets1a.set_attributes("100mbit", "1ms")
+ets1b.set_attributes("100mbit", "1ms")
+ets1c.set_attributes("100mbit", "1ms")
 
-# `Ping` from `h1` to `h3`, and `h4` to `h5`.
-h1.ping(eth3.address)
-h4.ping(eth5.address)
+# Setting bandwidth, delay, queuing discipline, and applying the queue discipline previously configured .
+# Setting bandwidth and delay for ets1d, ets1e, ets1f
+eth4.set_attributes("100mbit", "1ms", qdisc, **pfifo_parameter)
+eth5.set_attributes("100mbit", "1ms", qdisc, **pfifo_parameter)
+eth6.set_attributes("100mbit", "1ms", qdisc, **pfifo_parameter)
+ets1d.set_attributes("100mbit", "1ms", qdisc, **pfifo_parameter)
+ets1e.set_attributes("100mbit", "1ms", qdisc, **pfifo_parameter)
+ets1f.set_attributes("100mbit", "1ms", qdisc, **pfifo_parameter)
+
+
+# Creating a new experiment named "lan"
+exp = Experiment("lan")
+
+# Creating a TCP flow from node h1 to node h4 for 10 seconds
+flow1 = Flow(h1, h4, eth4.get_address(), 0, 10, 1)
+exp.add_tcp_flow(flow1)  # Adding the TCP flow to the experiment
+
+# Creating a UDP flow from node h2 to node h5 for 10 seconds
+flow2 = Flow(h2, h5, eth5.get_address(), 0, 10, 1)
+exp.add_udp_flow(flow2)  # Adding the UDP flow to the experiment
+
+# Specifying that we want to collect queuing discipline statistics for eth2
+exp.require_qdisc_stats(eth2)
+
+exp.run()  # Running the experiment
