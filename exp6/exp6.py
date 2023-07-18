@@ -100,17 +100,22 @@ exp = Experiment("lan")
 flow1 = Flow(h1, h5, eth5.get_address(), 0, 10, 1)
 exp.add_tcp_flow(flow1)  # Adding the TCP flow to the experiment
 
+# Creating a TCP flow from node h1 to node h6 for 10 seconds
+flow2 = Flow(h1, h6, eth6.get_address(), 0, 10, 1)
+exp.add_tcp_flow(flow2)  # Adding the TCP flow to the experiment
+
 # Creating a UDP flow from node h2 to node h6 for 10 seconds
 # specifying a larger bandwidth to simulate packet drops
-flow2 = Flow(h2, h6, eth6.get_address(), 0, 10, 1)
-exp.add_udp_flow(flow2,target_bandwidth='500mbit')  # Adding the UDP flow to the experiment
+flow3 = Flow(h2, h6, eth6.get_address(), 0, 10, 1)
+exp.add_udp_flow(flow3,target_bandwidth='500mbit')  # Adding the UDP flow to the experiment
 
 # Creating a UDP flow from node h2 to node h5 for 10 seconds
 # specifying a larger bandwidth to simulate packet drops
-flow3 = Flow(h2, h5, eth5.get_address(), 0, 10, 1)
-exp.add_udp_flow(flow3,target_bandwidth='500mbit')  # Adding the UDP flow to the experiment
+flow4 = Flow(h2, h5, eth5.get_address(), 0, 10, 1)
+exp.add_udp_flow(flow4,target_bandwidth='500mbit')  # Adding the UDP flow to the experiment
 
-# Specifying that we want to collect queuing discipline statistics for eth2
+# Specifying that we want to collect queuing discipline statistics for eth2 and eth6
 exp.require_qdisc_stats(eth5)
+exp.require_qdisc_stats(eth6)
 
 exp.run()  # Running the experiment
